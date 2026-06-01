@@ -10,7 +10,7 @@ import appointmentRouter from "./routes/appointmentRouter.js";
 import serviceAppointmentRouter from "./routes/serviceAppointmentRoutes.js";
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
 // Middlewares
