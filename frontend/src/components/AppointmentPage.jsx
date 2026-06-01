@@ -18,7 +18,9 @@ import {
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { Toaster } from "react-hot-toast";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://medicare-backend-cnj8.onrender.com";
 const API = axios.create({ baseURL: API_BASE });
 
 function pad(n) {
@@ -33,8 +35,18 @@ function parseDateTime(dateStr, timeStr) {
   if (parts.length === 3) {
     const [d, m, y] = parts;
     const months = {
-      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+      Jan: 0,
+      Feb: 1,
+      Mar: 2,
+      Apr: 3,
+      May: 4,
+      Jun: 5,
+      Jul: 6,
+      Aug: 7,
+      Sep: 8,
+      Oct: 9,
+      Nov: 10,
+      Dec: 11,
     };
     const month = months[m];
     let [t, ampm] = (timeStr || "").split(" ");
@@ -57,8 +69,15 @@ function computeStatus(item) {
 
   if (item.status === "Canceled") return "Canceled";
   if (item.status === "Rescheduled") {
-    if (item.rescheduledTo && item.rescheduledTo.date && item.rescheduledTo.time) {
-      const dt = parseDateTime(item.rescheduledTo.date, item.rescheduledTo.time);
+    if (
+      item.rescheduledTo &&
+      item.rescheduledTo.date &&
+      item.rescheduledTo.time
+    ) {
+      const dt = parseDateTime(
+        item.rescheduledTo.date,
+        item.rescheduledTo.time,
+      );
       if (now >= dt) return "Completed";
     }
     return "Rescheduled";
@@ -132,7 +151,10 @@ const AppointmentPage = () => {
   const [loadingServices, setLoadingServices] = useState(false);
   const [doctorAppts, setDoctorAppts] = useState([]);
   const [serviceAppts, setServiceAppts] = useState([]);
-  const [appointmentsRaw, setAppointmentsRaw] = useState({ doctors: [], services: [] });
+  const [appointmentsRaw, setAppointmentsRaw] = useState({
+    doctors: [],
+    services: [],
+  });
   const [error, setError] = useState(null);
 
   const loadDoctorAppointments = useCallback(async () => {
@@ -143,7 +165,10 @@ const AppointmentPage = () => {
     let token = null;
     try {
       token = await getToken();
-      console.log("Clerk token (frontend):", token ? `${token.slice(0, 20)}...` : null);
+      console.log(
+        "Clerk token (frontend):",
+        token ? `${token.slice(0, 20)}...` : null,
+      );
     } catch (err) {
       console.error("Failed to get Clerk token (frontend):", err);
     }
@@ -155,7 +180,8 @@ const AppointmentPage = () => {
       const resp = await API.get("/api/appointments/me", { headers });
       console.log("Response from /api/appointments/me:", resp?.data);
 
-      const fetched = resp?.data?.appointments ?? resp?.data?.data ?? resp?.data ?? [];
+      const fetched =
+        resp?.data?.appointments ?? resp?.data?.data ?? resp?.data ?? [];
       const arr = Array.isArray(fetched) ? fetched : [];
 
       const doctors = arr.filter((a) => {
@@ -169,15 +195,25 @@ const AppointmentPage = () => {
       setDoctorAppts(doctors);
       setAppointmentsRaw((p) => ({ ...p, doctors: doctors }));
     } catch (err) {
-      console.error("Error calling /api/appointments/me:", err?.response?.data || err.message || err);
+      console.error(
+        "Error calling /api/appointments/me:",
+        err?.response?.data || err.message || err,
+      );
 
       if (user?.id) {
         try {
           console.log("Attempting debug request with ?createdBy=", user.id);
-          const debugResp = await API.get(`/api/appointments/me?createdBy=${user.id}`, { headers });
+          const debugResp = await API.get(
+            `/api/appointments/me?createdBy=${user.id}`,
+            { headers },
+          );
           console.log("Debug fallback response:", debugResp?.data);
 
-          const fetched = debugResp?.data?.appointments ?? debugResp?.data?.data ?? debugResp?.data ?? [];
+          const fetched =
+            debugResp?.data?.appointments ??
+            debugResp?.data?.data ??
+            debugResp?.data ??
+            [];
           const arr = Array.isArray(fetched) ? fetched : [];
           const doctors = arr.filter(
             (a) =>
@@ -188,9 +224,14 @@ const AppointmentPage = () => {
           setDoctorAppts(doctors);
           setAppointmentsRaw((p) => ({ ...p, doctors }));
         } catch (err2) {
-          console.error("Debug fallback failed (doctors):", err2?.response?.data || err2.message || err2);
+          console.error(
+            "Debug fallback failed (doctors):",
+            err2?.response?.data || err2.message || err2,
+          );
           setError((prev) =>
-            prev ? prev + " | Doctors failed" : "Failed to load doctor appointments. Check console.",
+            prev
+              ? prev + " | Doctors failed"
+              : "Failed to load doctor appointments. Check console.",
           );
           setDoctorAppts([]);
         }
@@ -225,29 +266,45 @@ const AppointmentPage = () => {
       const resp = await API.get("/api/service-appointments/me", { headers });
       console.log("Response from /api/service-appointments/me:", resp?.data);
 
-      const fetched = resp?.data?.appointments ?? resp?.data?.data ?? resp?.data ?? [];
+      const fetched =
+        resp?.data?.appointments ?? resp?.data?.data ?? resp?.data ?? [];
       const arr = Array.isArray(fetched) ? fetched : [];
       console.log(arr);
 
       setServiceAppts(arr);
       setAppointmentsRaw((p) => ({ ...p, services: arr }));
     } catch (err) {
-      console.error("Error calling /api/service-appointments/me:", err?.response?.data || err.message || err);
+      console.error(
+        "Error calling /api/service-appointments/me:",
+        err?.response?.data || err.message || err,
+      );
 
       if (user?.id) {
         try {
           console.log("Attempting debug request with ?createdBy=", user.id);
-          const debugResp = await API.get(`/api/service-appointments/me?createdBy=${user.id}`, { headers });
+          const debugResp = await API.get(
+            `/api/service-appointments/me?createdBy=${user.id}`,
+            { headers },
+          );
           console.log("Debug fallback response (services):", debugResp?.data);
 
-          const fetched = debugResp?.data?.appointments ?? debugResp?.data?.data ?? debugResp?.data ?? [];
+          const fetched =
+            debugResp?.data?.appointments ??
+            debugResp?.data?.data ??
+            debugResp?.data ??
+            [];
           const arr = Array.isArray(fetched) ? fetched : [];
           setServiceAppts(arr);
           setAppointmentsRaw((p) => ({ ...p, services: arr }));
         } catch (err2) {
-          console.error("Debug fallback failed (services):", err2?.response?.data || err2.message || err2);
+          console.error(
+            "Debug fallback failed (services):",
+            err2?.response?.data || err2.message || err2,
+          );
           setError((prev) =>
-            prev ? prev + " | Services failed" : "Failed to load service appointments. Check console.",
+            prev
+              ? prev + " | Services failed"
+              : "Failed to load service appointments. Check console.",
           );
           setServiceAppts([]);
         }
@@ -267,12 +324,21 @@ const AppointmentPage = () => {
   useEffect(() => {
     loadDoctorAppointments();
     loadServiceAppointments();
-  }, [isLoaded, isSignedIn, user, loadDoctorAppointments, loadServiceAppointments]);
+  }, [
+    isLoaded,
+    isSignedIn,
+    user,
+    loadDoctorAppointments,
+    loadServiceAppointments,
+  ]);
 
   function normalizeRescheduled(rt) {
     if (!rt) return null;
     if (rt.date && rt.time) return { date: rt.date, time: rt.time };
-    if (rt.date && (rt.hour !== undefined || rt.minute !== undefined || rt.ampm)) {
+    if (
+      rt.date &&
+      (rt.hour !== undefined || rt.minute !== undefined || rt.ampm)
+    ) {
       const hour = rt.hour ?? 0;
       const minute = rt.minute ?? 0;
       const ampm = rt.ampm ?? "";
@@ -292,7 +358,8 @@ const AppointmentPage = () => {
     return doctorAppts
       .map((a) => {
         const id = a._id || a.id || String(a._id || "");
-        const doctorObj = typeof a.doctorId === "object" && a.doctorId ? a.doctorId : {};
+        const doctorObj =
+          typeof a.doctorId === "object" && a.doctorId ? a.doctorId : {};
         const image =
           doctorObj.imageUrl ||
           doctorObj.image ||
@@ -308,7 +375,8 @@ const AppointmentPage = () => {
           "Doctor";
 
         const patientName = a.patientName || a.patient || "Patient";
-        const specialization = doctorObj.specialization || a.specialization || a.speciality || "";
+        const specialization =
+          doctorObj.specialization || a.specialization || a.speciality || "";
         const experience = doctorObj.experience || a.experience || "";
         const date = a.date || "";
         let time = a.time || "";
@@ -326,13 +394,24 @@ const AppointmentPage = () => {
           a.status ||
           (a.payment && a.payment.status === "Paid" ? "Confirmed" : "Pending");
         const rescheduledTo = normalizeRescheduled(
-          a.rescheduledTo || { date: a.rescheduledDate, time: a.rescheduledTime },
+          a.rescheduledTo || {
+            date: a.rescheduledDate,
+            time: a.rescheduledTime,
+          },
         );
 
         return {
-          id, image, doctor: doctorName, patientName,
-          specialization, experience, date, time,
-          payment, status, rescheduledTo,
+          id,
+          image,
+          doctor: doctorName,
+          patientName,
+          specialization,
+          experience,
+          date,
+          time,
+          payment,
+          status,
+          rescheduledTo,
         };
       })
       .map((x) => ({ ...x, status: computeStatus(x) }));
@@ -342,7 +421,8 @@ const AppointmentPage = () => {
     return serviceAppts
       .map((s) => {
         const id = s._id || s.id || String(s._id || "");
-        const svc = typeof s.serviceId === "object" && s.serviceId ? s.serviceId : {};
+        const svc =
+          typeof s.serviceId === "object" && s.serviceId ? s.serviceId : {};
         const image =
           svc.imageUrl ||
           svc.image ||
@@ -370,9 +450,16 @@ const AppointmentPage = () => {
         const rescheduledTo = normalizeRescheduled(s.rescheduledTo || null);
 
         return {
-          id, image, name, patientName,
-          price, date, time, payment,
-          status, rescheduledTo,
+          id,
+          image,
+          name,
+          patientName,
+          price,
+          date,
+          time,
+          payment,
+          status,
+          rescheduledTo,
         };
       })
       .map((x) => ({ ...x, status: computeStatus(x) }));
@@ -382,7 +469,6 @@ const AppointmentPage = () => {
     <div className={appointmentPageStyles.pageContainer}>
       <Toaster position="top-right" />
       <div className={appointmentPageStyles.maxWidthContainer}>
-
         <h1 className={appointmentPageStyles.doctorTitle}>
           Your Doctor Appointments
         </h1>
@@ -500,7 +586,6 @@ const AppointmentPage = () => {
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

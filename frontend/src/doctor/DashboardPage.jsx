@@ -11,7 +11,9 @@ import {
 import { dashboardStyles } from "../assets/dummyStyles";
 import DoctorNavbar from "./DoctorNavbar";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://medicare-backend-cnj8.onrender.com";
 
 function parseDateTime(date, time) {
   return new Date(`${date}T${time}:00`);
@@ -330,180 +332,180 @@ export default function DashboardPage({ apiBase }) {
 
   return (
     <>
-    <DoctorNavbar />
-    <div className={dashboardStyles.pageContainer}>
-      <div className={dashboardStyles.contentWrapper}>
-        <div className={dashboardStyles.headerContainer}>
-          <div>
-            <h1 className={dashboardStyles.headerTitle}>
-              {doctorNameFromData
-                ? `${doctorNameFromData} — Dashboard`
-                : doctorId
-                  ? `Doctor Dashboard`
-                  : "Doctor Dashboard"}
-            </h1>
-            <p className={dashboardStyles.headerSubtitle}>
-              {doctorId
-                ? `Showing appointments for doctor ${doctorId}`
-                : "Overview of latest appointments & earnings"}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className={dashboardStyles.headerInfo}>
-              {loading ? "Loading..." : `${appointments.length} total`}
+      <DoctorNavbar />
+      <div className={dashboardStyles.pageContainer}>
+        <div className={dashboardStyles.contentWrapper}>
+          <div className={dashboardStyles.headerContainer}>
+            <div>
+              <h1 className={dashboardStyles.headerTitle}>
+                {doctorNameFromData
+                  ? `${doctorNameFromData} — Dashboard`
+                  : doctorId
+                    ? `Doctor Dashboard`
+                    : "Doctor Dashboard"}
+              </h1>
+              <p className={dashboardStyles.headerSubtitle}>
+                {doctorId
+                  ? `Showing appointments for doctor ${doctorId}`
+                  : "Overview of latest appointments & earnings"}
+              </p>
             </div>
-            <button
-              onClick={() => fetchAppointments()}
-              className={dashboardStyles.refreshButton}
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
 
-        {/* Stat cards */}
-        <div className={dashboardStyles.statsGrid}>
-          <StatCard
-            title="Total Appointments"
-            value={totalAppointments}
-            icon={<Calendar className="w-5 h-5" />}
-            accentTop={dashboardStyles.accentTopEmerald}
-            accentBottom={dashboardStyles.accentBottomEmerald}
-          />
-
-          <StatCard
-            title="Total Earnings"
-            value={`₹ ${totalEarnings}`}
-            icon={<BadgeIndianRupee className="w-5 h-5" />}
-            accentTop={dashboardStyles.accentTopAmber}
-            accentBottom={dashboardStyles.accentBottomAmber}
-          />
-
-          <StatCard
-            title="Completed"
-            value={completedAppointments}
-            icon={<CheckCircle className="w-5 h-5" />}
-            accentTop={dashboardStyles.accentTopEmeraldLight}
-            accentBottom={dashboardStyles.accentBottomEmerald}
-          />
-
-          <StatCard
-            title="Cancelled"
-            value={cancelledAppointments}
-            icon={<XCircle className="w-5 h-5" />}
-            accentTop={dashboardStyles.accentTopRose}
-            accentBottom={dashboardStyles.accentBottomRose}
-          />
-        </div>
-
-        <div className={dashboardStyles.appointmentsContainer}>
-          <div className={dashboardStyles.appointmentsHeader}>
-            <h2 className={dashboardStyles.appointmentsTitle}>
-              Latest Appointments
-            </h2>
             <div className="flex items-center gap-3">
-              <div className={dashboardStyles.appointmentsTotal}>
-                <Users className={dashboardStyles.totalIcon} />
-                <span>{totalAppointments} total</span>
+              <div className={dashboardStyles.headerInfo}>
+                {loading ? "Loading..." : `${appointments.length} total`}
               </div>
+              <button
+                onClick={() => fetchAppointments()}
+                className={dashboardStyles.refreshButton}
+              >
+                Refresh
+              </button>
             </div>
           </div>
 
-          {/* Cards grid */}
-          <div className={dashboardStyles.cardsGrid}>
-            {top8.map((a) => (
-              <div key={a.id} className={dashboardStyles.appointmentCard}>
-                <div className={dashboardStyles.cardHeader}>
-                  <div className={dashboardStyles.cardAvatar}>
-                    {a.doctorImage ? (
-                      <img
-                        src={a.doctorImage}
-                        alt={a.doctorName}
-                        onError={(e) =>
-                          (e.currentTarget.style.display = "none")
-                        }
-                        className={dashboardStyles.cardAvatarImage}
-                      />
-                    ) : (
-                      <div className={dashboardStyles.cardAvatarFallback}>
-                        {(a.doctorName || "D").charAt(0)}
-                      </div>
-                    )}
-                  </div>
+          {/* Stat cards */}
+          <div className={dashboardStyles.statsGrid}>
+            <StatCard
+              title="Total Appointments"
+              value={totalAppointments}
+              icon={<Calendar className="w-5 h-5" />}
+              accentTop={dashboardStyles.accentTopEmerald}
+              accentBottom={dashboardStyles.accentBottomEmerald}
+            />
 
-                  <div className={dashboardStyles.cardContent}>
-                    <div className={dashboardStyles.cardPatientName}>
-                      {a.patient}
-                    </div>
-                    <div className={dashboardStyles.cardPatientInfo}>
-                      {a.age} yrs · {a.gender}
-                    </div>
-                    <div className={dashboardStyles.cardDoctorInfo}>
-                      <span className={dashboardStyles.cardDoctorName}>
-                        {a.doctorName}
-                      </span>
-                    </div>
-                    <div className={dashboardStyles.cardSpeciality}>
-                      {a.speciality}
-                    </div>
-                    <div className={dashboardStyles.cardPhoneContainer}>
-                      <Phone className={dashboardStyles.cardPhoneIcon} />
-                      <span>{a.mobile}</span>
-                    </div>
-                  </div>
-                </div>
+            <StatCard
+              title="Total Earnings"
+              value={`₹ ${totalEarnings}`}
+              icon={<BadgeIndianRupee className="w-5 h-5" />}
+              accentTop={dashboardStyles.accentTopAmber}
+              accentBottom={dashboardStyles.accentBottomAmber}
+            />
 
-                <div className={dashboardStyles.dateTimeContainer}>
-                  <div className={dashboardStyles.dateText}>
-                    {formatDate(a.date)}
-                  </div>
-                  <div className={dashboardStyles.timeText}>
-                    {formatTimeAMPM(a.time)}
-                  </div>
-                </div>
+            <StatCard
+              title="Completed"
+              value={completedAppointments}
+              icon={<CheckCircle className="w-5 h-5" />}
+              accentTop={dashboardStyles.accentTopEmeraldLight}
+              accentBottom={dashboardStyles.accentBottomEmerald}
+            />
 
-                <div>
-                  <div className={dashboardStyles.cardFooter}>
-                    <div className={dashboardStyles.feeText}>₹{a.fee}</div>
-
-                    <div className={dashboardStyles.statusContainer}>
-                      <StatusBadge status={a.status} />
-                      <StatusSelect
-                        appointment={a}
-                        onChange={(s) => updateStatus(a.id, s)}
-                      />
-                    </div>
-
-                    <div className="mt-2 w-full">
-                      <RescheduleButton
-                        appointment={a}
-                        onReschedule={(newDate, newTime) =>
-                          updateDateTime(a.id, newDate, newTime)
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <StatCard
+              title="Cancelled"
+              value={cancelledAppointments}
+              icon={<XCircle className="w-5 h-5" />}
+              accentTop={dashboardStyles.accentTopRose}
+              accentBottom={dashboardStyles.accentBottomRose}
+            />
           </div>
 
-          <div className={dashboardStyles.showMoreContainer}>
-            <Link
-              to={
-                doctorId
-                  ? `/doctor-admin/${doctorId}/appointments`
-                  : "/appointments"
-              }
-              className={dashboardStyles.showMoreButton}
-            >
-              Show more
-            </Link>
+          <div className={dashboardStyles.appointmentsContainer}>
+            <div className={dashboardStyles.appointmentsHeader}>
+              <h2 className={dashboardStyles.appointmentsTitle}>
+                Latest Appointments
+              </h2>
+              <div className="flex items-center gap-3">
+                <div className={dashboardStyles.appointmentsTotal}>
+                  <Users className={dashboardStyles.totalIcon} />
+                  <span>{totalAppointments} total</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cards grid */}
+            <div className={dashboardStyles.cardsGrid}>
+              {top8.map((a) => (
+                <div key={a.id} className={dashboardStyles.appointmentCard}>
+                  <div className={dashboardStyles.cardHeader}>
+                    <div className={dashboardStyles.cardAvatar}>
+                      {a.doctorImage ? (
+                        <img
+                          src={a.doctorImage}
+                          alt={a.doctorName}
+                          onError={(e) =>
+                            (e.currentTarget.style.display = "none")
+                          }
+                          className={dashboardStyles.cardAvatarImage}
+                        />
+                      ) : (
+                        <div className={dashboardStyles.cardAvatarFallback}>
+                          {(a.doctorName || "D").charAt(0)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={dashboardStyles.cardContent}>
+                      <div className={dashboardStyles.cardPatientName}>
+                        {a.patient}
+                      </div>
+                      <div className={dashboardStyles.cardPatientInfo}>
+                        {a.age} yrs · {a.gender}
+                      </div>
+                      <div className={dashboardStyles.cardDoctorInfo}>
+                        <span className={dashboardStyles.cardDoctorName}>
+                          {a.doctorName}
+                        </span>
+                      </div>
+                      <div className={dashboardStyles.cardSpeciality}>
+                        {a.speciality}
+                      </div>
+                      <div className={dashboardStyles.cardPhoneContainer}>
+                        <Phone className={dashboardStyles.cardPhoneIcon} />
+                        <span>{a.mobile}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={dashboardStyles.dateTimeContainer}>
+                    <div className={dashboardStyles.dateText}>
+                      {formatDate(a.date)}
+                    </div>
+                    <div className={dashboardStyles.timeText}>
+                      {formatTimeAMPM(a.time)}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className={dashboardStyles.cardFooter}>
+                      <div className={dashboardStyles.feeText}>₹{a.fee}</div>
+
+                      <div className={dashboardStyles.statusContainer}>
+                        <StatusBadge status={a.status} />
+                        <StatusSelect
+                          appointment={a}
+                          onChange={(s) => updateStatus(a.id, s)}
+                        />
+                      </div>
+
+                      <div className="mt-2 w-full">
+                        <RescheduleButton
+                          appointment={a}
+                          onReschedule={(newDate, newTime) =>
+                            updateDateTime(a.id, newDate, newTime)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className={dashboardStyles.showMoreContainer}>
+              <Link
+                to={
+                  doctorId
+                    ? `/doctor-admin/${doctorId}/appointments`
+                    : "/appointments"
+                }
+                className={dashboardStyles.showMoreButton}
+              >
+                Show more
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

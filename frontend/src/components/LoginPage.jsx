@@ -3,13 +3,15 @@ import { loginPageStyles, toastStyles } from "../assets/dummyStyles";
 import logo from "../assets/logo.png";
 //import { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft,  } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 
 const STORAGE_KEY = "doctorToken_v1";
 
 const LoginPage = () => {
-  const API_BASE = "http://localhost:4000";
+  const API_BASE =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://medicare-backend-cnj8.onrender.com";
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();

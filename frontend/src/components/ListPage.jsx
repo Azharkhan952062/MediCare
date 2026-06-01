@@ -3,7 +3,9 @@ import { listPageStyles } from "../assets/dummyStyles";
 import { useParams } from "react-router-dom";
 import { Calendar, Phone, Search, X } from "lucide-react";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://medicare-backend-cnj8.onrender.com";
 
 function parseDateTime(date, time) {
   return new Date(`${date}T${time}:00`);

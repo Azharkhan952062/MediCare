@@ -107,7 +107,9 @@ const ServiceCard = ({ service }) => {
 };
 
 const ServicePage = ({ previewCount = 9999 }) => {
-  const API_BASE = "http://localhost:4000";
+  const API_BASE =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://medicare-backend-cnj8.onrender.com";
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -192,26 +194,26 @@ const ServicePage = ({ previewCount = 9999 }) => {
           </div>
         )}
         {loading ? (
-            <section className={servicePageStyles.skeletonGrid}>
-                {Array.from({length : 8}).map((_,i) => (
-                    <div key={i} className={servicePageStyles.skeletonCard}>
-                        <div className={servicePageStyles.skeletonImage}></div>
-                        <div className={servicePageStyles.skeletonText1}></div>
-                        <div className={servicePageStyles.skeletonText2}></div>
-                        <div className={servicePageStyles.skeletonButton}></div>
-                    </div>
-                ))}
-            </section>
+          <section className={servicePageStyles.skeletonGrid}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className={servicePageStyles.skeletonCard}>
+                <div className={servicePageStyles.skeletonImage}></div>
+                <div className={servicePageStyles.skeletonText1}></div>
+                <div className={servicePageStyles.skeletonText2}></div>
+                <div className={servicePageStyles.skeletonButton}></div>
+              </div>
+            ))}
+          </section>
         ) : (
-            <section className={servicePageStyles.servicesGrid}>
-                {shown.length > 0 ? (
-                    shown.map((s) => <ServiceCard key={s.id || s.name} service={s} />)
-                ) : (
-                    <div className={servicePageStyles.emptyState}>
-                        No service available.
-                    </div>
-                )}
-            </section>
+          <section className={servicePageStyles.servicesGrid}>
+            {shown.length > 0 ? (
+              shown.map((s) => <ServiceCard key={s.id || s.name} service={s} />)
+            ) : (
+              <div className={servicePageStyles.emptyState}>
+                No service available.
+              </div>
+            )}
+          </section>
         )}
       </div>
     </div>
