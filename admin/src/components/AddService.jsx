@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 
 const AddService = ({ serviceId }) => {
-  const API_BASE = "http://localhost:4000";
+  const API_BASE =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://medicare-backend-cnj8.onrender.com";
 
   const fileRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);

@@ -55,7 +55,9 @@ function normalizeService(doc) {
   };
 }
 
-const API_BASE = "http://localhost:4000";
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://medicare-backend-cnj8.onrender.com";
 
 const ServiceDashboard = ({ services: servicesProp = null }) => {
   const [services, setServices] = useState(

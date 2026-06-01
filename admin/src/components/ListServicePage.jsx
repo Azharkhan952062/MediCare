@@ -13,7 +13,9 @@ import {
 import { serviceListStyles as s } from "../assets/dummyStyles";
 
 export default function ListServicePage() {
-  const API_BASE = "http://localhost:4000";
+  const API_BASE =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://medicare-backend-cnj8.onrender.com";
 
   const [services, setServices] = useState([]);
   const [openDetails, setOpenDetails] = useState({});
@@ -30,7 +32,7 @@ export default function ListServicePage() {
     type = "success",
     ttl = 3000,
     position = "bottom-right",
-    animated = false
+    animated = false,
   ) {
     const id = Date.now() + Math.random();
     setToasts((t) => [...t, { id, message, type, position, animated }]);
@@ -60,51 +62,52 @@ export default function ListServicePage() {
     return `${yyyy}-${mm}-${dd}`;
   })();
 
-function sortSlotsForDisplay(slots = []) {
-  if (!Array.isArray(slots)) return [];
+  function sortSlotsForDisplay(slots = []) {
+    if (!Array.isArray(slots)) return [];
 
-  const today = new Date();
-  const todayVal = Date.UTC(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
+    const today = new Date();
+    const todayVal = Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
 
-  const dateOnlyVal = (dateStr) => {
-    if (!dateStr || typeof dateStr !== "string") return Number.POSITIVE_INFINITY;
-    const parts = dateStr.split("-");
-    if (parts.length !== 3) return Number.POSITIVE_INFINITY;
-    const y = Number(parts[0]),
-      m = Number(parts[1]) - 1,
-      d = Number(parts[2]);
-    if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d))
-      return Number.POSITIVE_INFINITY;
-    return Date.UTC(y, m, d);
-  };
-  const arr = slots.slice();
+    const dateOnlyVal = (dateStr) => {
+      if (!dateStr || typeof dateStr !== "string")
+        return Number.POSITIVE_INFINITY;
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return Number.POSITIVE_INFINITY;
+      const y = Number(parts[0]),
+        m = Number(parts[1]) - 1,
+        d = Number(parts[2]);
+      if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d))
+        return Number.POSITIVE_INFINITY;
+      return Date.UTC(y, m, d);
+    };
+    const arr = slots.slice();
 
-  arr.sort((a, b) => {
-    const aDateVal = dateOnlyVal(a.date);
-    const bDateVal = dateOnlyVal(b.date);
+    arr.sort((a, b) => {
+      const aDateVal = dateOnlyVal(a.date);
+      const bDateVal = dateOnlyVal(b.date);
 
-    const aIsPast = aDateVal < todayVal;
-    const bIsPast = bDateVal < todayVal;
-    if (aIsPast !== bIsPast) return aIsPast ? -1 : 1;
+      const aIsPast = aDateVal < todayVal;
+      const bIsPast = bDateVal < todayVal;
+      if (aIsPast !== bIsPast) return aIsPast ? -1 : 1;
 
-    if (aIsPast && bIsPast && aDateVal !== bDateVal) {
-      return bDateVal - aDateVal;
-    }
-    if (!aIsPast && !bIsPast && aDateVal !== bDateVal) {
-      return aDateVal - bDateVal;
-    }
+      if (aIsPast && bIsPast && aDateVal !== bDateVal) {
+        return bDateVal - aDateVal;
+      }
+      if (!aIsPast && !bIsPast && aDateVal !== bDateVal) {
+        return aDateVal - bDateVal;
+      }
 
-    const aTs = slotDateTimeToMs(a) || Number.POSITIVE_INFINITY;
-    const bTs = slotDateTimeToMs(b) || Number.POSITIVE_INFINITY;
-    return aTs - bTs;
-  });
+      const aTs = slotDateTimeToMs(a) || Number.POSITIVE_INFINITY;
+      const bTs = slotDateTimeToMs(b) || Number.POSITIVE_INFINITY;
+      return aTs - bTs;
+    });
 
-  return arr;
-}
+    return arr;
+  }
 
   async function fetchServices() {
     try {
@@ -123,7 +126,7 @@ function sortSlotsForDisplay(slots = []) {
         about: s.about || "",
         instructions: s.instructions || s.preInstructions || [],
         instructionsText: (s.instructions || s.preInstructions || []).join(
-          "\n"
+          "\n",
         ),
         price: s.price ?? s.fee ?? 0,
         available: s.available ?? s.availability === "Available",
@@ -132,8 +135,8 @@ function sortSlotsForDisplay(slots = []) {
         slots: Array.isArray(s.slots)
           ? convertSlotsForUI(s.slots)
           : s.slots && typeof s.slots === "object"
-          ? convertSlotsMapToArray(s.slots)
-          : [],
+            ? convertSlotsMapToArray(s.slots)
+            : [],
         _raw: s,
       }));
       setServices(normalized);
@@ -152,7 +155,7 @@ function sortSlotsForDisplay(slots = []) {
     return (slotStrings || []).map((s, idx) => {
       const raw = String(s || "");
       const m = raw.match(
-        /^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})\s*•\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i
+        /^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})\s*•\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i,
       );
       if (m) {
         const day = m[1].padStart(2, "0");
@@ -162,7 +165,7 @@ function sortSlotsForDisplay(slots = []) {
         const minute = String(m[5]).padStart(2, "0");
         const ampm = (m[6] || "AM").toUpperCase();
         const mi = months.findIndex(
-          (mm) => mm.toLowerCase() === monthShort.toLowerCase()
+          (mm) => mm.toLowerCase() === monthShort.toLowerCase(),
         );
         const monthNum = mi >= 0 ? String(mi + 1).padStart(2, "0") : "01";
         const date = `${year}-${monthNum}-${day}`;
@@ -170,7 +173,7 @@ function sortSlotsForDisplay(slots = []) {
       }
 
       const isoMatch = raw.match(
-        /^(\d{4}-\d{2}-\d{2})(?:[T\s](\d{2}):(\d{2})(?::\d{2})?(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?)?/
+        /^(\d{4}-\d{2}-\d{2})(?:[T\s](\d{2}):(\d{2})(?::\d{2})?(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?)?/,
       );
       if (isoMatch) {
         const datePart = isoMatch[1];
@@ -261,7 +264,7 @@ function sortSlotsForDisplay(slots = []) {
     const raw = String(timeStr);
 
     const isoMatch = raw.match(
-      /[T\s](\d{2}):(\d{2})(?::\d{2})?(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?$/
+      /[T\s](\d{2}):(\d{2})(?::\d{2})?(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})?$/,
     );
     if (isoMatch) {
       const hh24 = Number(isoMatch[1]);
@@ -305,8 +308,7 @@ function sortSlotsForDisplay(slots = []) {
         if (res.ok && body) {
           latest = body.data || body.service || body;
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     const normalized = {
@@ -326,7 +328,7 @@ function sortSlotsForDisplay(slots = []) {
       slots: sortSlotsForDisplay(
         Array.isArray(latest.slots)
           ? convertSlotsForUI(latest.slots)
-          : convertSlotsMapToArray(latest.slots)
+          : convertSlotsMapToArray(latest.slots),
       ),
     };
 
@@ -454,12 +456,12 @@ function sortSlotsForDisplay(slots = []) {
         const [date, hour, minute, ampm] = dupKey.split("|");
         addToast(
           `Duplicate slot detected: ${formatDateHuman(
-            date
+            date,
           )} — ${hour}:${minute} ${ampm}`,
           "error",
           4000,
           "top-right",
-          true
+          true,
         );
         return;
       }
@@ -472,7 +474,7 @@ function sortSlotsForDisplay(slots = []) {
       fd.append("price", String(Number(editForm.price || 0)));
       fd.append(
         "availability",
-        editForm.available ? "available" : "unavailable"
+        editForm.available ? "available" : "unavailable",
       );
 
       const instructions = (editForm.instructionsText || "")
@@ -480,7 +482,7 @@ function sortSlotsForDisplay(slots = []) {
         .map((s) => s.trim())
         .filter(Boolean);
       fd.append("instructions", JSON.stringify(instructions));
-    
+
       const slotsFormatted = slotsToFormattedStrings(editForm.slots || []);
       fd.append("slots", JSON.stringify(slotsFormatted));
 
@@ -525,8 +527,8 @@ function sortSlotsForDisplay(slots = []) {
                     : editForm.slots || s.slots,
                 _raw: updatedRaw || s._raw,
               }
-            : s
-        )
+            : s,
+        ),
       );
 
       addToast("Service updated successfully", "success");
@@ -595,14 +597,14 @@ function sortSlotsForDisplay(slots = []) {
         if (value < todayISO) {
           addToast(
             "Cannot select a past date. Choose today or a future date.",
-            "error"
+            "error",
           );
           return p;
         }
       }
 
       const newSlots = (p.slots || []).map((s) =>
-        s.id === slotId ? { ...s, [field]: value } : s
+        s.id === slotId ? { ...s, [field]: value } : s,
       );
 
       const dupKey = findDuplicateInSlots(newSlots || []);
@@ -610,12 +612,12 @@ function sortSlotsForDisplay(slots = []) {
         const [date, hour, minute, ampm] = dupKey.split("|");
         addToast(
           `Duplicate slot detected: ${formatDateHuman(
-            date
+            date,
           )} — ${hour}:${minute} ${ampm}`,
           "error",
           3500,
           "top-right",
-          true
+          true,
         );
       }
 
@@ -924,7 +926,7 @@ function sortSlotsForDisplay(slots = []) {
                               >
                                 {Array.from(
                                   { length: 12 },
-                                  (_, i) => i + 1
+                                  (_, i) => i + 1,
                                 ).map((h) => (
                                   <option key={h} value={String(h)}>
                                     {h}
@@ -948,7 +950,7 @@ function sortSlotsForDisplay(slots = []) {
                                     >
                                       {String(m).padStart(2, "0")}
                                     </option>
-                                  )
+                                  ),
                                 )}
                               </select>
 

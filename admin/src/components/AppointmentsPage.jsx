@@ -6,7 +6,9 @@ import {
 } from "../assets/dummyStyles";
 import { Calendar, IndianRupee, Loader, Search } from "lucide-react";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://medicare-backend-cnj8.onrender.com";
 
 // HELPER FUNCTIONS;
 // this function return the date as 22 jan 2026;
@@ -424,12 +426,13 @@ const AppointmentsPage = () => {
 
         {sortedFiltered.length > 8 && (
           <div className="flex justify-center mt-4">
-            <button 
-            onClick={() => setShowAll((s) => !s)}
-            className={pageStyles.showMoreButton}>
-              {showAll 
-              ? "Show Less"
-              : `Show more (${sortedFiltered.length - 8})`}
+            <button
+              onClick={() => setShowAll((s) => !s)}
+              className={pageStyles.showMoreButton}
+            >
+              {showAll
+                ? "Show Less"
+                : `Show more (${sortedFiltered.length - 8})`}
             </button>
           </div>
         )}
