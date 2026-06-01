@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 //import { Home } from "lucide-react"
 import Home from "./pages/Home";
 import Add from "./pages/Add";
-import List from "./pages/list";
+import List from "./pages/List";
 import Appointments from "./pages/Appointments";
 import SetDashboard from "./pages/SetDashboard";
 import AddSer from "./pages/AddSer";
