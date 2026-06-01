@@ -16,6 +16,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://medicare-nine-eosin.vercel.app",
+  "https://medicare-admin-omega.vercel.app",
 ];
 // Middlewares
 app.use(
