@@ -16,6 +16,7 @@ import Appointments from "./pages/Appointments";
 import { CircleChevronUp } from "lucide-react";
 import VerifyPayments from "../VerifyPayments";
 import VerifyServicePayment from "../VerifyServicePayment";
+import AIChatbot from "./components/AiChatbot";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -69,6 +70,7 @@ const App = () => {
   return (
     <>
       <ScrollToTop />
+      <AIChatbot />
       <div className="overflow-x-hidden bg-white text-gray-900">
         <Routes>
           <Route path="/" element={<Home />} />
