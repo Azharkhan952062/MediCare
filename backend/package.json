@@ -10,8 +10,10 @@
     "start": "nodemon server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
     "@clerk/clerk-sdk-node": "^4.13.23",
     "@clerk/express": "^2.1.0",
+    "@google/generative-ai": "^0.24.1",
     "body-parser": "^2.2.2",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.6",
