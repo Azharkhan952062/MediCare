@@ -16,7 +16,7 @@ import Appointments from "./pages/Appointments";
 import { CircleChevronUp } from "lucide-react";
 import VerifyPayments from "../VerifyPayments";
 import VerifyServicePayment from "../VerifyServicePayment";
-import AIChatbot from "./components/AiChatbot";
+import AIChatbot from "./components/AIChatbot";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
